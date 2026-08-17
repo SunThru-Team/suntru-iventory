@@ -37,6 +37,25 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive",
 ]
 
+TAB_DISPLAY_NAMES = {
+    "H1000-H1999":    "Hand Tools & Hardware",
+    "E1000 - E1999":  "Electrical Hardware",
+    "F1000-F1999":    "Fasteners",
+    "W1000-W1999":    "PPE Equipment",
+    "S1000-S1999":    "SOMA14",
+    "S2000-S2999":    "SOMA50 for NSF",
+    "S3000-S3999":    "SOMA50x12 for 2UR",
+    "S4000-S4999":    "SOMA50x24 for 2UR",
+    "M1000-M1999":    "Molds and Consumables",
+    "D1000-D1999":    "SOMA5x5",
+    "D2000-D2999":    "DARPA Press",
+    "T1000-T1999":    "Aerogel Transport & Post-Processing",
+    "P1000-P1999":    "Product and Mockups",
+    "Y1000-Y1999":    "SOMA72",
+    "R1000-R1999":    "Standards for Implementing Mold Features",
+    "Z1000-Z1999":    "Full Line Integration",
+}
+
 TITLE_ROW_TABS    = {"W1000", "L1000"}
 SUMMARY_TAB       = "Summary"
 LOCATION_REF_TAB  = "Location Code Reference"
@@ -125,6 +144,11 @@ def get_tab_meta() -> dict[str, dict]:
                         if len(rest) > 1:     meta[tab]["description"]  = rest[1]
         except Exception:
             pass
+    # Apply hardcoded display names (override sheet values)
+    for tab, name in TAB_DISPLAY_NAMES.items():
+        if tab in meta:
+            meta[tab]["display_name"] = name
+
     return meta
 
 
