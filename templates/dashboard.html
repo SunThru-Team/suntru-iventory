@@ -6,7 +6,6 @@
   <title>Dashboard — SunThru</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --blue:   #1F5C99;
       --bg:     #f3f4f6;
@@ -16,154 +15,110 @@
       --sub:    #6b7280;
       --red:    #dc2626;
       --orange: #ea580c;
-      --green:  #16a34a;
       --tab-h:  56px;
     }
     @media (prefers-color-scheme: dark) {
-      :root { --bg: #111827; --card: #1f2937; --border: #374151; --text: #f9fafb; --sub: #9ca3af; }
+      :root { --bg:#111827; --card:#1f2937; --border:#374151; --text:#f9fafb; --sub:#9ca3af; }
     }
-
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-      padding: 16px 16px calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 24px);
+      padding: 16px 16px calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 24px);
       min-height: 100vh;
     }
+    h1 { font-size: 22px; font-weight: 800; margin-bottom: 16px; padding-top: env(safe-area-inset-top,0px); }
 
-    h1 {
-      font-size: 22px; font-weight: 800; margin-bottom: 16px;
-      padding-top: env(safe-area-inset-top, 0px);
-    }
+    /* stat row */
+    .stat-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+    .stat-card.full { grid-column: 1/-1; display: flex; align-items: center; gap: 16px; }
+    .stat-num   { font-size: 36px; font-weight: 800; color: var(--blue); line-height: 1; }
+    .stat-label { font-size: 13px; color: var(--sub); font-weight: 500; margin-top: 4px; }
+    .stat-icon  { font-size: 32px; }
 
-    /* ── Stat row ── */
-    .stat-row {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .stat-card.full { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 16px; }
-    .stat-num  { font-size: 36px; font-weight: 800; color: var(--blue); line-height: 1; }
-    .stat-label{ font-size: 13px; color: var(--sub); font-weight: 500; }
-    .stat-icon { font-size: 32px; }
-
-    /* ── Section blocks ── */
+    /* sections */
     .section { margin-bottom: 20px; }
-    .section-head {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 10px;
-    }
+    .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .section-head h2 { font-size: 16px; font-weight: 700; }
-    .see-more {
-      font-size: 13px; font-weight: 600; color: var(--blue);
-      background: none; border: none; cursor: pointer;
-      font-family: inherit; padding: 0; text-decoration: none;
-    }
+    .see-more { font-size: 13px; font-weight: 600; color: var(--blue); background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; }
 
-    .block {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-    }
+    .block { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
 
-    /* Tab summary grid */
-    .tab-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-    }
+    /* tab grid */
+    .tab-grid { display: grid; grid-template-columns: repeat(2,1fr); }
     .tab-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 11px 16px;
-      border-bottom: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-      font-size: 14px;
-      text-decoration: none; color: var(--text);
+      padding: 11px 16px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border);
+      font-size: 14px; text-decoration: none; color: var(--text);
     }
-    .tab-row:nth-child(even) { border-right: none; }
-    .tab-row:nth-last-child(-n+2) { border-bottom: none; }
-    .tab-name { font-weight: 600; }
+    .tab-row:nth-child(even)     { border-right: none; }
+    .tab-row:nth-last-child(-n+2){ border-bottom: none; }
+    .tab-name  { font-weight: 600; }
     .tab-count { font-weight: 700; color: var(--blue); }
 
-    /* List rows */
+    /* list rows */
     .list-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 11px 16px;
-      border-bottom: 1px solid var(--border);
-      text-decoration: none; color: var(--text);
+      display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+      border-bottom: 1px solid var(--border); text-decoration: none; color: var(--text);
     }
     .list-row:last-child { border-bottom: none; }
-    .list-row:active { background: var(--bg); }
-
     .row-id   { font-size: 12px; font-weight: 700; color: var(--sub); width: 52px; flex-shrink: 0; }
-    .row-name { font-size: 14px; font-weight: 600; flex: 1; min-width: 0;
-                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-name { font-size: 14px; font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .row-meta { font-size: 12px; color: var(--sub); flex-shrink: 0; }
-
-    .badge {
-      display: inline-flex; align-items: center;
-      font-size: 11px; font-weight: 600; padding: 2px 7px;
-      border-radius: 99px; flex-shrink: 0;
-    }
+    .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 99px; flex-shrink: 0; }
     .badge-red    { background: #fee2e2; color: var(--red); }
     .badge-orange { background: #ffedd5; color: var(--orange); }
-
     .empty { padding: 20px 16px; font-size: 14px; color: var(--sub); text-align: center; }
 
-    /* Tab bar */
+    /* skeleton shimmer */
+    .skeleton {
+      background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .skel-row { display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+    .skel-row:last-child { border-bottom: none; }
+    .skel-id   { width: 44px; height: 12px; flex-shrink: 0; }
+    .skel-name { height: 14px; flex: 1; }
+    .skel-badge{ width: 56px; height: 20px; border-radius: 99px; }
+    .skel-stat { height: 36px; width: 60px; border-radius: 6px; }
+
+    /* tab bar */
     .tab-bar {
       position: fixed; bottom: 0; left: 0; right: 0;
-      height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
-      background: var(--card);
-      border-top: 1px solid var(--border);
+      height: calc(var(--tab-h) + env(safe-area-inset-bottom,0px));
+      background: var(--card); border-top: 1px solid var(--border);
       display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-bottom: env(safe-area-inset-bottom,0px);
     }
     .tab-bar::-webkit-scrollbar { display: none; }
     .tab-bar a {
-      flex: 0 0 auto; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 3px; padding: 0 14px; min-width: 64px;
-      font-size: 10px; font-weight: 500; color: var(--sub);
-      text-decoration: none; white-space: nowrap;
+      flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 3px; padding: 0 14px; min-width: 64px;
+      font-size: 10px; font-weight: 500; color: var(--sub); text-decoration: none; white-space: nowrap;
     }
     .tab-bar a.active { color: var(--blue); }
     .tab-bar a svg { width: 22px; height: 22px; }
 
-    /* Full-screen overlay for See More */
+    /* overlay */
     .overlay {
-      display: none; position: fixed; inset: 0;
-      background: var(--bg); z-index: 100;
-      flex-direction: column;
-      padding: 0 0 calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 8px);
-      overflow-y: auto;
+      display: none; position: fixed; inset: 0; background: var(--bg); z-index: 100;
+      flex-direction: column; overflow-y: auto;
+      padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 8px);
     }
     .overlay.open { display: flex; }
     .overlay-head {
-      position: sticky; top: 0; background: var(--card);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 16px;
-      display: flex; align-items: center; gap: 12px;
-      z-index: 10;
+      position: sticky; top: 0; background: var(--card); border-bottom: 1px solid var(--border);
+      padding: 14px 16px; display: flex; align-items: center; gap: 12px; z-index: 10;
     }
     .overlay-head h2 { font-size: 17px; font-weight: 700; flex: 1; }
     .overlay-close {
-      background: var(--bg); border: none; border-radius: 99px;
-      width: 30px; height: 30px; font-size: 18px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--sub);
+      background: var(--bg); border: none; border-radius: 99px; width: 30px; height: 30px;
+      font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--sub);
     }
-    .overlay-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .overlay-body { padding: 12px 16px; }
     .overlay .block { border-radius: 14px; }
   </style>
 </head>
@@ -171,113 +126,74 @@
 
   <h1>Dashboard</h1>
 
-  <!-- ── Total inventory ── -->
+  <!-- Stat row -->
   <div class="stat-row">
     <div class="stat-card full">
       <div class="stat-icon">📦</div>
       <div>
-        <div class="stat-num">{{ total }}</div>
+        <div class="stat-num" id="stat-total"><span class="skeleton skel-stat" style="display:inline-block"></span></div>
         <div class="stat-label">Total items across all tabs</div>
       </div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" style="color:var(--red)">{{ reorder_items | length }}</div>
+      <div class="stat-num" id="stat-reorder" style="color:var(--red)"><span class="skeleton skel-stat" style="display:inline-block"></span></div>
       <div class="stat-label">Reorder alerts</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" style="color:var(--orange)">{{ needs_repair | length }}</div>
+      <div class="stat-num" id="stat-repair" style="color:var(--orange)"><span class="skeleton skel-stat" style="display:inline-block"></span></div>
       <div class="stat-label">Needs repair</div>
     </div>
   </div>
 
-  <!-- ── Tab summary ── -->
+  <!-- Tab Summary -->
   <div class="section">
     <div class="section-head">
       <h2>Tab Summary</h2>
-      <button class="see-more" onclick="openOverlay('overlay-tabs')">See all</button>
+      <button class="see-more" id="btn-tabs-more" onclick="openOverlay('overlay-tabs')" style="display:none">See all</button>
     </div>
     <div class="block">
-      <div class="tab-grid" id="tab-grid-preview">
-        {% for tab in all_tabs[:10] %}
-        <a class="tab-row" href="/?tab={{ tab }}">
-          <span class="tab-name">{{ tab_meta[tab].display_name if tab in tab_meta else tab }}</span>
-          <span class="tab-count">{{ tab_counts.get(tab, 0) }}</span>
-        </a>
+      <div class="tab-grid" id="tab-grid">
+        {% for i in range(6) %}
+        <div class="tab-row"><span class="skeleton skel-name" style="width:70%"></span><span class="skeleton" style="width:24px;height:14px"></span></div>
         {% endfor %}
       </div>
     </div>
   </div>
 
-  <!-- ── Reorder alerts ── -->
+  <!-- Reorder Alerts -->
   <div class="section">
     <div class="section-head">
       <h2>🔴 Reorder Alerts</h2>
-      {% if reorder_items | length > 5 %}
-      <button class="see-more" onclick="openOverlay('overlay-reorder')">See all ({{ reorder_items | length }})</button>
-      {% endif %}
+      <button class="see-more" id="btn-reorder-more" onclick="openOverlay('overlay-reorder')" style="display:none">See all</button>
     </div>
-    <div class="block">
-      {% if reorder_items %}
-        {% for item in reorder_items[:5] %}
-        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
-          <span class="row-id">{{ item.id }}</span>
-          <span class="row-name">{{ item.name or item.id }}</span>
-          <span class="badge badge-red">Reorder</span>
-        </a>
-        {% endfor %}
-      {% else %}
-        <div class="empty">✅ No items need reordering</div>
-      {% endif %}
+    <div class="block" id="block-reorder">
+      {% for i in range(3) %}<div class="skel-row"><span class="skeleton skel-id"></span><span class="skeleton skel-name"></span><span class="skeleton skel-badge"></span></div>{% endfor %}
     </div>
   </div>
 
-  <!-- ── Items missing data ── -->
+  <!-- Missing Data -->
   <div class="section">
     <div class="section-head">
       <h2>⚠️ Missing Data</h2>
-      {% if missing_items | length > 5 %}
-      <button class="see-more" onclick="openOverlay('overlay-missing')">See all ({{ missing_items | length }})</button>
-      {% endif %}
+      <button class="see-more" id="btn-missing-more" onclick="openOverlay('overlay-missing')" style="display:none">See all</button>
     </div>
-    <div class="block">
-      {% if missing_items %}
-        {% for item in missing_items[:5] %}
-        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
-          <span class="row-id">{{ item.id }}</span>
-          <span class="row-name">{{ item.name or item.id }}</span>
-          <span class="row-meta">{{ item.missing | join(", ") }}</span>
-        </a>
-        {% endfor %}
-      {% else %}
-        <div class="empty">✅ All items have complete data</div>
-      {% endif %}
+    <div class="block" id="block-missing">
+      {% for i in range(3) %}<div class="skel-row"><span class="skeleton skel-id"></span><span class="skeleton skel-name"></span><span class="skeleton skel-badge"></span></div>{% endfor %}
     </div>
   </div>
 
-  <!-- ── Needs repair ── -->
+  <!-- Needs Repair -->
   <div class="section">
     <div class="section-head">
       <h2>🔧 Needs Repair</h2>
-      {% if needs_repair | length > 5 %}
-      <button class="see-more" onclick="openOverlay('overlay-repair')">See all ({{ needs_repair | length }})</button>
-      {% endif %}
+      <button class="see-more" id="btn-repair-more" onclick="openOverlay('overlay-repair')" style="display:none">See all</button>
     </div>
-    <div class="block">
-      {% if needs_repair %}
-        {% for item in needs_repair[:5] %}
-        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
-          <span class="row-id">{{ item.id }}</span>
-          <span class="row-name">{{ item.name or item.id }}</span>
-          <span class="badge badge-orange">Repair</span>
-        </a>
-        {% endfor %}
-      {% else %}
-        <div class="empty">✅ Nothing needs repair</div>
-      {% endif %}
+    <div class="block" id="block-repair">
+      {% for i in range(3) %}<div class="skel-row"><span class="skeleton skel-id"></span><span class="skeleton skel-name"></span><span class="skeleton skel-badge"></span></div>{% endfor %}
     </div>
   </div>
 
-  <!-- ── Tab bar ── -->
+  <!-- Tab bar -->
   <nav class="tab-bar">
     <a href="/dashboard" class="active">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -295,86 +211,138 @@
     {% endfor %}
   </nav>
 
-  <!-- ── Overlays (See More) ── -->
-
-  <!-- All tabs -->
+  <!-- Overlays -->
   <div class="overlay" id="overlay-tabs">
     <div class="overlay-head">
       <h2>All Tabs</h2>
       <button class="overlay-close" onclick="closeOverlay('overlay-tabs')">✕</button>
     </div>
-    <div class="overlay-body">
-      <div class="block">
-        <div class="tab-grid">
-          {% for tab in all_tabs %}
-          <a class="tab-row" href="/?tab={{ tab }}">
-            <span class="tab-name">{{ tab_meta[tab].display_name if tab in tab_meta else tab }}</span>
-            <span class="tab-count">{{ tab_counts.get(tab, 0) }}</span>
-          </a>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
+    <div class="overlay-body"><div class="block"><div class="tab-grid" id="overlay-tab-grid"></div></div></div>
   </div>
 
-  <!-- All reorder -->
   <div class="overlay" id="overlay-reorder">
     <div class="overlay-head">
-      <h2>Reorder Alerts ({{ reorder_items | length }})</h2>
+      <h2 id="overlay-reorder-title">Reorder Alerts</h2>
       <button class="overlay-close" onclick="closeOverlay('overlay-reorder')">✕</button>
     </div>
-    <div class="overlay-body">
-      <div class="block">
-        {% for item in reorder_items %}
-        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
-          <span class="row-id">{{ item.id }}</span>
-          <span class="row-name">{{ item.name or item.id }}</span>
-          <span class="badge badge-red">Reorder</span>
-        </a>
-        {% endfor %}
-      </div>
-    </div>
+    <div class="overlay-body"><div class="block" id="overlay-reorder-body"></div></div>
   </div>
 
-  <!-- All missing -->
   <div class="overlay" id="overlay-missing">
     <div class="overlay-head">
-      <h2>Missing Data ({{ missing_items | length }})</h2>
+      <h2 id="overlay-missing-title">Missing Data</h2>
       <button class="overlay-close" onclick="closeOverlay('overlay-missing')">✕</button>
     </div>
-    <div class="overlay-body">
-      <div class="block">
-        {% for item in missing_items %}
-        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
-          <span class="row-id">{{ item.id }}</span>
-          <span class="row-name">{{ item.name or item.id }}</span>
-          <span class="row-meta">{{ item.missing | join(", ") }}</span>
-        </a>
-        {% endfor %}
-      </div>
-    </div>
+    <div class="overlay-body"><div class="block" id="overlay-missing-body"></div></div>
   </div>
 
-  <!-- All repair -->
   <div class="overlay" id="overlay-repair">
     <div class="overlay-head">
-      <h2>Needs Repair ({{ needs_repair | length }})</h2>
+      <h2 id="overlay-repair-title">Needs Repair</h2>
       <button class="overlay-close" onclick="closeOverlay('overlay-repair')">✕</button>
     </div>
-    <div class="overlay-body">
-      <div class="block">
-        {% for item in needs_repair %}
-        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
-          <span class="row-id">{{ item.id }}</span>
-          <span class="row-name">{{ item.name or item.id }}</span>
-          <span class="badge badge-orange">Repair</span>
-        </a>
-        {% endfor %}
-      </div>
-    </div>
+    <div class="overlay-body"><div class="block" id="overlay-repair-body"></div></div>
   </div>
 
   <script>
+    const TAB_META = {{ tab_meta | tojson }};
+    const ALL_TABS = {{ all_tabs | tojson }};
+
+    function displayName(tab) {
+      return TAB_META[tab]?.display_name || tab;
+    }
+
+    function itemLink(item) {
+      return `/item?id=${encodeURIComponent(item.id)}&tab=${encodeURIComponent(item.tab)}`;
+    }
+
+    function listRow(item, badgeHtml) {
+      return `<a class="list-row" href="${itemLink(item)}">
+        <span class="row-id">${item.id}</span>
+        <span class="row-name">${item.name || item.id}</span>
+        ${badgeHtml}
+      </a>`;
+    }
+
+    function renderList(items, badgeFn, blockId, btnId, titleId, max=5) {
+      const block = document.getElementById(blockId);
+      if (!items.length) {
+        block.innerHTML = '<div class="empty">✅ All clear</div>';
+        return;
+      }
+      block.innerHTML = items.slice(0, max).map(i => listRow(i, badgeFn(i))).join('');
+      if (items.length > max) {
+        const btn = document.getElementById(btnId);
+        btn.textContent = `See all (${items.length})`;
+        btn.style.display = '';
+      }
+      if (titleId) document.getElementById(titleId).textContent += ` (${items.length})`;
+    }
+
+    function renderTabGrid(tabCounts, gridId, all) {
+      const tabs = all ? ALL_TABS : ALL_TABS.slice(0, 10);
+      document.getElementById(gridId).innerHTML = tabs.map((tab, i) => {
+        const n = tabCounts[tab] ?? 0;
+        const isLast2 = i >= tabs.length - 2;
+        return `<a class="tab-row" href="/?tab=${encodeURIComponent(tab)}"
+          style="${isLast2 ? 'border-bottom:none;' : ''}${i%2===1 ? 'border-right:none;' : ''}">
+          <span class="tab-name">${displayName(tab)}</span>
+          <span class="tab-count">${n}</span>
+        </a>`;
+      }).join('');
+    }
+
+    fetch('/api/dashboard-stats')
+      .then(r => r.json())
+      .then(d => {
+        // Stats
+        document.getElementById('stat-total').textContent   = d.total;
+        document.getElementById('stat-reorder').textContent = d.reorder_items.length;
+        document.getElementById('stat-repair').textContent  = d.needs_repair.length;
+
+        // Tab grids
+        renderTabGrid(d.tab_counts, 'tab-grid', false);
+        renderTabGrid(d.tab_counts, 'overlay-tab-grid', true);
+        if (ALL_TABS.length > 10) {
+          document.getElementById('btn-tabs-more').style.display = '';
+        }
+
+        // Overlay full lists
+        document.getElementById('overlay-reorder-body').innerHTML =
+          d.reorder_items.length
+            ? d.reorder_items.map(i => listRow(i, '<span class="badge badge-red">Reorder</span>')).join('')
+            : '<div class="empty">✅ No items need reordering</div>';
+        document.getElementById('overlay-reorder-title').textContent = `Reorder Alerts (${d.reorder_items.length})`;
+
+        document.getElementById('overlay-missing-body').innerHTML =
+          d.missing_items.length
+            ? d.missing_items.map(i => listRow(i, `<span class="row-meta">${i.missing.join(', ')}</span>`)).join('')
+            : '<div class="empty">✅ All items have complete data</div>';
+        document.getElementById('overlay-missing-title').textContent = `Missing Data (${d.missing_items.length})`;
+
+        document.getElementById('overlay-repair-body').innerHTML =
+          d.needs_repair.length
+            ? d.needs_repair.map(i => listRow(i, '<span class="badge badge-orange">Repair</span>')).join('')
+            : '<div class="empty">✅ Nothing needs repair</div>';
+        document.getElementById('overlay-repair-title').textContent = `Needs Repair (${d.needs_repair.length})`;
+
+        // Preview blocks (5 max)
+        renderList(d.reorder_items, () => '<span class="badge badge-red">Reorder</span>',
+          'block-reorder', 'btn-reorder-more', null);
+        renderList(d.missing_items, i => `<span class="row-meta">${i.missing.join(', ')}</span>`,
+          'block-missing', 'btn-missing-more', null);
+        renderList(d.needs_repair, () => '<span class="badge badge-orange">Repair</span>',
+          'block-repair', 'btn-repair-more', null);
+      })
+      .catch(() => {
+        ['block-reorder','block-missing','block-repair'].forEach(id => {
+          document.getElementById(id).innerHTML = '<div class="empty">Failed to load — try refreshing</div>';
+        });
+        document.getElementById('stat-total').textContent   = '—';
+        document.getElementById('stat-reorder').textContent = '—';
+        document.getElementById('stat-repair').textContent  = '—';
+      });
+
     function openOverlay(id)  { document.getElementById(id).classList.add('open'); }
     function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
   </script>
