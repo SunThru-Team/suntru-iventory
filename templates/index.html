@@ -342,6 +342,12 @@
 
   <!-- Bottom tab bar -->
   <nav class="tab-bar" id="tab-bar">
+    <a href="/dashboard" class="">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>
+      </svg>
+      Dashboard
+    </a>
     {% for tab in all_tabs %}
     <a href="/?tab={{ tab }}"
        class="{{ 'active' if tab == active_tab else '' }}"

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — SunThru</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:   #1F5C99;
+      --bg:     #f3f4f6;
+      --card:   #ffffff;
+      --border: #e5e7eb;
+      --text:   #111827;
+      --sub:    #6b7280;
+      --red:    #dc2626;
+      --orange: #ea580c;
+      --green:  #16a34a;
+      --tab-h:  56px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #111827; --card: #1f2937; --border: #374151; --text: #f9fafb; --sub: #9ca3af; }
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      padding: 16px 16px calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 24px);
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 22px; font-weight: 800; margin-bottom: 16px;
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    /* ── Stat row ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stat-card.full { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 16px; }
+    .stat-num  { font-size: 36px; font-weight: 800; color: var(--blue); line-height: 1; }
+    .stat-label{ font-size: 13px; color: var(--sub); font-weight: 500; }
+    .stat-icon { font-size: 32px; }
+
+    /* ── Section blocks ── */
+    .section { margin-bottom: 20px; }
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .section-head h2 { font-size: 16px; font-weight: 700; }
+    .see-more {
+      font-size: 13px; font-weight: 600; color: var(--blue);
+      background: none; border: none; cursor: pointer;
+      font-family: inherit; padding: 0; text-decoration: none;
+    }
+
+    .block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    /* Tab summary grid */
+    .tab-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .tab-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      font-size: 14px;
+      text-decoration: none; color: var(--text);
+    }
+    .tab-row:nth-child(even) { border-right: none; }
+    .tab-row:nth-last-child(-n+2) { border-bottom: none; }
+    .tab-name { font-weight: 600; }
+    .tab-count { font-weight: 700; color: var(--blue); }
+
+    /* List rows */
+    .list-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none; color: var(--text);
+    }
+    .list-row:last-child { border-bottom: none; }
+    .list-row:active { background: var(--bg); }
+
+    .row-id   { font-size: 12px; font-weight: 700; color: var(--sub); width: 52px; flex-shrink: 0; }
+    .row-name { font-size: 14px; font-weight: 600; flex: 1; min-width: 0;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-meta { font-size: 12px; color: var(--sub); flex-shrink: 0; }
+
+    .badge {
+      display: inline-flex; align-items: center;
+      font-size: 11px; font-weight: 600; padding: 2px 7px;
+      border-radius: 99px; flex-shrink: 0;
+    }
+    .badge-red    { background: #fee2e2; color: var(--red); }
+    .badge-orange { background: #ffedd5; color: var(--orange); }
+
+    .empty { padding: 20px 16px; font-size: 14px; color: var(--sub); text-align: center; }
+
+    /* Tab bar */
+    .tab-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-bar a {
+      flex: 0 0 auto; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 3px; padding: 0 14px; min-width: 64px;
+      font-size: 10px; font-weight: 500; color: var(--sub);
+      text-decoration: none; white-space: nowrap;
+    }
+    .tab-bar a.active { color: var(--blue); }
+    .tab-bar a svg { width: 22px; height: 22px; }
+
+    /* Full-screen overlay for See More */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: var(--bg); z-index: 100;
+      flex-direction: column;
+      padding: 0 0 calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 8px);
+      overflow-y: auto;
+    }
+    .overlay.open { display: flex; }
+    .overlay-head {
+      position: sticky; top: 0; background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      z-index: 10;
+    }
+    .overlay-head h2 { font-size: 17px; font-weight: 700; flex: 1; }
+    .overlay-close {
+      background: var(--bg); border: none; border-radius: 99px;
+      width: 30px; height: 30px; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--sub);
+    }
+    .overlay-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .overlay .block { border-radius: 14px; }
+  </style>
+</head>
+<body>
+
+  <h1>Dashboard</h1>
+
+  <!-- ── Total inventory ── -->
+  <div class="stat-row">
+    <div class="stat-card full">
+      <div class="stat-icon">📦</div>
+      <div>
+        <div class="stat-num">{{ total }}</div>
+        <div class="stat-label">Total items across all tabs</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--red)">{{ reorder_items | length }}</div>
+      <div class="stat-label">Reorder alerts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--orange)">{{ needs_repair | length }}</div>
+      <div class="stat-label">Needs repair</div>
+    </div>
+  </div>
+
+  <!-- ── Tab summary ── -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Tab Summary</h2>
+      <button class="see-more" onclick="openOverlay('overlay-tabs')">See all</button>
+    </div>
+    <div class="block">
+      <div class="tab-grid" id="tab-grid-preview">
+        {% for tab in all_tabs[:10] %}
+        <a class="tab-row" href="/?tab={{ tab }}">
+          <span class="tab-name">{{ tab_meta[tab].display_name if tab in tab_meta else tab }}</span>
+          <span class="tab-count">{{ tab_counts.get(tab, 0) }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Reorder alerts ── -->
+  <div class="section">
+    <div class="section-head">
+      <h2>🔴 Reorder Alerts</h2>
+      {% if reorder_items | length > 5 %}
+      <button class="see-more" onclick="openOverlay('overlay-reorder')">See all ({{ reorder_items | length }})</button>
+      {% endif %}
+    </div>
+    <div class="block">
+      {% if reorder_items %}
+        {% for item in reorder_items[:5] %}
+        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
+          <span class="row-id">{{ item.id }}</span>
+          <span class="row-name">{{ item.name or item.id }}</span>
+          <span class="badge badge-red">Reorder</span>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty">✅ No items need reordering</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── Items missing data ── -->
+  <div class="section">
+    <div class="section-head">
+      <h2>⚠️ Missing Data</h2>
+      {% if missing_items | length > 5 %}
+      <button class="see-more" onclick="openOverlay('overlay-missing')">See all ({{ missing_items | length }})</button>
+      {% endif %}
+    </div>
+    <div class="block">
+      {% if missing_items %}
+        {% for item in missing_items[:5] %}
+        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
+          <span class="row-id">{{ item.id }}</span>
+          <span class="row-name">{{ item.name or item.id }}</span>
+          <span class="row-meta">{{ item.missing | join(", ") }}</span>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty">✅ All items have complete data</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── Needs repair ── -->
+  <div class="section">
+    <div class="section-head">
+      <h2>🔧 Needs Repair</h2>
+      {% if needs_repair | length > 5 %}
+      <button class="see-more" onclick="openOverlay('overlay-repair')">See all ({{ needs_repair | length }})</button>
+      {% endif %}
+    </div>
+    <div class="block">
+      {% if needs_repair %}
+        {% for item in needs_repair[:5] %}
+        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
+          <span class="row-id">{{ item.id }}</span>
+          <span class="row-name">{{ item.name or item.id }}</span>
+          <span class="badge badge-orange">Repair</span>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty">✅ Nothing needs repair</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── Tab bar ── -->
+  <nav class="tab-bar">
+    <a href="/dashboard" class="active">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>
+      </svg>
+      Dashboard
+    </a>
+    {% for tab in all_tabs %}
+    <a href="/?tab={{ tab }}">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+      </svg>
+      {{ tab_meta[tab].display_name if tab in tab_meta else tab }}
+    </a>
+    {% endfor %}
+  </nav>
+
+  <!-- ── Overlays (See More) ── -->
+
+  <!-- All tabs -->
+  <div class="overlay" id="overlay-tabs">
+    <div class="overlay-head">
+      <h2>All Tabs</h2>
+      <button class="overlay-close" onclick="closeOverlay('overlay-tabs')">✕</button>
+    </div>
+    <div class="overlay-body">
+      <div class="block">
+        <div class="tab-grid">
+          {% for tab in all_tabs %}
+          <a class="tab-row" href="/?tab={{ tab }}">
+            <span class="tab-name">{{ tab_meta[tab].display_name if tab in tab_meta else tab }}</span>
+            <span class="tab-count">{{ tab_counts.get(tab, 0) }}</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All reorder -->
+  <div class="overlay" id="overlay-reorder">
+    <div class="overlay-head">
+      <h2>Reorder Alerts ({{ reorder_items | length }})</h2>
+      <button class="overlay-close" onclick="closeOverlay('overlay-reorder')">✕</button>
+    </div>
+    <div class="overlay-body">
+      <div class="block">
+        {% for item in reorder_items %}
+        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
+          <span class="row-id">{{ item.id }}</span>
+          <span class="row-name">{{ item.name or item.id }}</span>
+          <span class="badge badge-red">Reorder</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- All missing -->
+  <div class="overlay" id="overlay-missing">
+    <div class="overlay-head">
+      <h2>Missing Data ({{ missing_items | length }})</h2>
+      <button class="overlay-close" onclick="closeOverlay('overlay-missing')">✕</button>
+    </div>
+    <div class="overlay-body">
+      <div class="block">
+        {% for item in missing_items %}
+        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
+          <span class="row-id">{{ item.id }}</span>
+          <span class="row-name">{{ item.name or item.id }}</span>
+          <span class="row-meta">{{ item.missing | join(", ") }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- All repair -->
+  <div class="overlay" id="overlay-repair">
+    <div class="overlay-head">
+      <h2>Needs Repair ({{ needs_repair | length }})</h2>
+      <button class="overlay-close" onclick="closeOverlay('overlay-repair')">✕</button>
+    </div>
+    <div class="overlay-body">
+      <div class="block">
+        {% for item in needs_repair %}
+        <a class="list-row" href="/item?id={{ item.id | urlencode }}&tab={{ item.tab | urlencode }}">
+          <span class="row-id">{{ item.id }}</span>
+          <span class="row-name">{{ item.name or item.id }}</span>
+          <span class="badge badge-orange">Repair</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openOverlay(id)  { document.getElementById(id).classList.add('open'); }
+    function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+  </script>
+
+</body>
+</html>

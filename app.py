@@ -412,6 +412,54 @@ def label_image(tab, identifier):
                      download_name=f"label-{identifier}.png")
 
 
+@app.route("/dashboard")
+def dashboard():
+    all_tabs = get_all_tabs()
+    tab_meta = get_tab_meta()
+
+    tab_counts      = {}
+    reorder_items   = []
+    missing_items   = []
+    needs_repair    = []
+    total           = 0
+
+    for tab in all_tabs:
+        try:
+            data  = get_tab_items(tab)
+            items = data["items"]
+            tab_counts[tab] = len(items)
+            total += len(items)
+
+            for item in items:
+                f  = item["fields"]
+                id_ = item["identifier"]
+
+                # Reorder alerts
+                if f.get("reorder_flag", "").strip().lower() == "yes":
+                    reorder_items.append({"tab": tab, "id": id_, "name": f.get("part_name", "")})
+
+                # Missing data: no photo AND (no location OR no qty)
+                missing = []
+                if not f.get("photo"):        missing.append("photo")
+                if not f.get("location_code"): missing.append("location")
+                if not f.get("qty"):           missing.append("qty")
+                if missing:
+                    missing_items.append({"tab": tab, "id": id_, "name": f.get("part_name", ""), "missing": missing})
+
+                # Needs repair
+                if f.get("condition", "").strip().lower() == "needs repair":
+                    needs_repair.append({"tab": tab, "id": id_, "name": f.get("part_name", "")})
+        except Exception:
+            tab_counts[tab] = 0
+
+    return render_template("dashboard.html",
+        all_tabs=all_tabs, tab_meta=tab_meta,
+        tab_counts=tab_counts, total=total,
+        reorder_items=reorder_items,
+        missing_items=missing_items,
+        needs_repair=needs_repair)
+
+
 @app.route("/add")
 def add_page():
     all_tabs   = get_all_tabs()
