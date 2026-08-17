@@ -144,10 +144,14 @@ def get_tab_meta() -> dict[str, dict]:
                         if len(rest) > 1:     meta[tab]["description"]  = rest[1]
         except Exception:
             pass
-    # Apply hardcoded display names (override sheet values)
-    for tab, name in TAB_DISPLAY_NAMES.items():
-        if tab in meta:
-            meta[tab]["display_name"] = name
+    # Apply hardcoded display names (override sheet values).
+    # Normalize by collapsing spaces around dashes so "E1000 - E1999" matches "E1000-E1999".
+    def _norm(s): return s.replace(" - ", "-").replace("- ", "-").replace(" -", "-").strip()
+    norm_to_real = {_norm(k): k for k in meta}
+    for tab_key, name in TAB_DISPLAY_NAMES.items():
+        real = norm_to_real.get(_norm(tab_key))
+        if real:
+            meta[real]["display_name"] = name
 
     return meta
 
@@ -440,12 +444,17 @@ def label_image(tab, identifier):
 def dashboard():
     all_tabs = get_all_tabs()
     tab_meta = get_tab_meta()
+    return render_template("dashboard.html", all_tabs=all_tabs, tab_meta=tab_meta)
 
-    tab_counts      = {}
-    reorder_items   = []
-    missing_items   = []
-    needs_repair    = []
-    total           = 0
+
+@app.route("/api/dashboard-stats")
+def api_dashboard_stats():
+    all_tabs      = get_all_tabs()
+    tab_counts    = {}
+    reorder_items = []
+    missing_items = []
+    needs_repair  = []
+    total         = 0
 
     for tab in all_tabs:
         try:
@@ -455,33 +464,31 @@ def dashboard():
             total += len(items)
 
             for item in items:
-                f  = item["fields"]
+                f   = item["fields"]
                 id_ = item["identifier"]
 
-                # Reorder alerts
                 if f.get("reorder_flag", "").strip().lower() == "yes":
                     reorder_items.append({"tab": tab, "id": id_, "name": f.get("part_name", "")})
 
-                # Missing data: no photo AND (no location OR no qty)
                 missing = []
-                if not f.get("photo"):        missing.append("photo")
+                if not f.get("photo"):         missing.append("photo")
                 if not f.get("location_code"): missing.append("location")
                 if not f.get("qty"):           missing.append("qty")
                 if missing:
                     missing_items.append({"tab": tab, "id": id_, "name": f.get("part_name", ""), "missing": missing})
 
-                # Needs repair
                 if f.get("condition", "").strip().lower() == "needs repair":
                     needs_repair.append({"tab": tab, "id": id_, "name": f.get("part_name", "")})
         except Exception:
             tab_counts[tab] = 0
 
-    return render_template("dashboard.html",
-        all_tabs=all_tabs, tab_meta=tab_meta,
-        tab_counts=tab_counts, total=total,
-        reorder_items=reorder_items,
-        missing_items=missing_items,
-        needs_repair=needs_repair)
+    return jsonify({
+        "total": total,
+        "tab_counts": tab_counts,
+        "reorder_items": reorder_items,
+        "missing_items": missing_items,
+        "needs_repair": needs_repair,
+    })
 
 
 @app.route("/add")
